@@ -1,9 +1,10 @@
 import streamlit as st
 import requests
 import pyperclip
+
 # Define the URL for the FastAPI backend
 API_URL = "http://127.0.0.1:8000"
-flag_copy=False
+
 # Function to call FastAPI backend
 def call_backend(endpoint, payload):
     try:
@@ -14,7 +15,9 @@ def call_backend(endpoint, payload):
         st.error(f"HTTP error occurred: {http_err}")
     except Exception as err:
         st.error(f"An error occurred: {err}")
-def copy_text(text):
+
+# Function to copy text to the clipboard
+def copy_to_clipboard(text):
     pyperclip.copy(text)
     st.success("Text copied to clipboard!")
 
@@ -22,9 +25,8 @@ def copy_text(text):
 def display_card_with_actions(content, title):
     if content:
         st.title(title)
-        st.write(content)
-        if st.button("Copy Text"):
-            copy_text(content)
+        st.text_area(label="Result", value=content, height=800, key="text_area", disabled=True)
+
 # Streamlit UI
 
 custom_font = """
