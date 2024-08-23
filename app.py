@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-import streamlit.components.v1 as components
+import pyperclip
 
 # Define the URL for the FastAPI backend
 API_URL = "http://127.0.0.1:8000"
@@ -16,42 +16,29 @@ def call_backend(endpoint, payload):
     except Exception as err:
         st.error(f"An error occurred: {err}")
 
-# Function to display text with both download and copy options
-def display_text_with_options(text, label="Text"):
-    st.markdown(f"**{label}:**")
-    
-    # Display the text
-    st.markdown(f"<pre id='text-to-copy'>{text}</pre>", unsafe_allow_html=True)
-    
-    # Download button
-    st.download_button(
-        label="Download Text",
-        data=text,
-        file_name="text.txt",
-        mime="text/plain"
-    )
-    
-    # JavaScript for copy to clipboard
-    components.html(
-        """
-        <script>
-        function copyText() {
-            var text = document.getElementById("text-to-copy").innerText;
-            navigator.clipboard.writeText(text).then(function() {
-                alert("Text copied to clipboard!");
-            }, function(err) {
-                alert("Failed to copy text: " + err);
-            });
-        }
-        </script>
-        <button onclick="copyText()">Copy Text</button>
-        """,
-        height=100,
-        width=150
-    )
+# Function to display a card with optional actions
+def display_card_with_actions(content, title):
+   if content:
+        st.write(title)
+        st.write(content)
+
+        # Add buttons below the card
+        st.button("Copy Text")
+        try:    
+            if pyperclip.copy(content):
+                st.success("Text Copied!!!")
+        except pyperclip.PyperclipException:
+                st.error("Failed to copy text.")
+
+        st.download_button(
+            label="Download Text",
+            data=content,
+            file_name="text.txt",
+            mime="text/plain"
+        )
 
 # Streamlit UI
-st.title("NotesBuddy")
+st.title("TextSwordAI")
 
 # Feature selection
 st.sidebar.title("Features")
@@ -67,7 +54,7 @@ if feature == "Summarize Your Points":
         if text_to_summarize:
             summary = call_backend("summarize", {"text": text_to_summarize, "topic": "", "text_to_be_improved": ""})
             if summary:
-                display_text_with_options(summary.get("summary"), "Summary")
+                display_card_with_actions(summary.get("summary"), "Summary")
         else:
             st.warning("Please enter some text to summarize.")
 
@@ -87,7 +74,7 @@ elif feature == "Write a Mail":
                 "text_to_be_improved": ""
             })
             if mail_content:
-                display_text_with_options(mail_content.get("mail_content"), "Generated Mail")
+                display_card_with_actions(mail_content.get("mail_content"), "Generated Mail")
         else:
             st.warning("Please fill in all fields to generate the mail.")
 
@@ -98,7 +85,7 @@ elif feature == "Correct Grammar":
         if text_to_improve:
             improved_text = call_backend("grammar", {"text": "", "topic": "", "text_to_be_improved": text_to_improve})
             if improved_text:
-                display_text_with_options(improved_text.get("text_to_be_improved"), "Improved Text")
+                display_card_with_actions(improved_text.get("text_to_be_improved"), "Improved Text")
         else:
             st.warning("Please enter text to correct grammar.")
 
@@ -109,6 +96,6 @@ elif feature == "Info About Any Topic":
         if topic_to_search:
             information = call_backend("information", {"text": "", "topic": topic_to_search, "text_to_be_improved": ""})
             if information:
-                display_text_with_options(information.get("information"), "Information")
+                display_card_with_actions(information.get("information"), "Information")
         else:
             st.warning("Please enter a topic to search.")
