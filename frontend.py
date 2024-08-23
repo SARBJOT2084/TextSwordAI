@@ -1,10 +1,9 @@
 import streamlit as st
 import requests
 import pyperclip
-
 # Define the URL for the FastAPI backend
 API_URL = "http://127.0.0.1:8000"
-
+flag_copy=False
 # Function to call FastAPI backend
 def call_backend(endpoint, payload):
     try:
@@ -15,32 +14,43 @@ def call_backend(endpoint, payload):
         st.error(f"HTTP error occurred: {http_err}")
     except Exception as err:
         st.error(f"An error occurred: {err}")
+def copy_text(text):
+    pyperclip.copy(text)
+    st.success("Text copied to clipboard!")
 
 # Function to display a card with optional actions
 def display_card_with_actions(content, title):
-   if content:
-        st.write(title)
+    if content:
+        st.title(title)
         st.write(content)
-
-        # Add buttons below the card
-        st.button("Copy Text")
-        try:    
-            if pyperclip.copy(content):
-                st.success("Text Copied!!!")
-        except pyperclip.PyperclipException:
-                st.error("Failed to copy text.")
-
-        st.download_button(
-            label="Download Text",
-            data=content,
-            file_name="text.txt",
-            mime="text/plain"
-        )
-
+        if st.button("Copy Text"):
+            copy_text(content)
 # Streamlit UI
-st.title("TextSwordAI")
 
-# Feature selection
+custom_font = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Style+Script&display=swap');
+
+.custom-font {
+    font-family: "Style", cursive;
+    font-weight:600;
+    font-size: 50px;
+    color: #4A90E2;
+}
+
+.custom-font > p {
+    font-size: 50px;
+}
+</style>
+<div class="custom-font">
+    <p>TextSword&#x2694;</p>
+</div>
+"""
+
+# Use st.write to render the custom HTML
+st.write(custom_font, unsafe_allow_html=True)
+
+st.write("Words are mightier than the sword ....")
 st.sidebar.title("Features")
 feature = st.sidebar.selectbox(
     "Choose a feature:",
