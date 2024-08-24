@@ -3,8 +3,8 @@ import requests
 import pyperclip
 
 # Define the URL for the FastAPI backend
-API_URL = "http://127.0.0.1:8000"
-
+# API_URL = "http://127.0.0.1:8000"
+API_URL="http://172.31.83.51:8000"
 # Function to call FastAPI backend
 def call_backend(endpoint, payload):
     try:

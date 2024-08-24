@@ -3,7 +3,6 @@ from pydantic import BaseModel, Field
 import google.generativeai as genai
 import os 
 from dotenv import load_dotenv
-import os
 app = FastAPI()
 
 load_dotenv()
